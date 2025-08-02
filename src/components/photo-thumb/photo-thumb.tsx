@@ -8,7 +8,7 @@ type PhotoThumbProps = {
 };
 
 export const PhotoThumb = ({ id, size = 120 }: PhotoThumbProps) => {
-  const meta = useAppSelector((s) => photosSelectors.selectById(s, id));
+  const meta = useAppSelector((s) => photosSelectors.selectPhotoById(s, id));
   const [url, setUrl] = useState<string>();
 
   useEffect(() => {

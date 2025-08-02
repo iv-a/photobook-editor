@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 
 export const Gallery = () => {
   const dispatch = useAppDispatch();
-  const ids = useAppSelector(photosSelectors.selectIds);
+  const ids = useAppSelector(photosSelectors.selectPhotoIds);
 
   const onClear = () => {
     dispatch(photosActions.clear());

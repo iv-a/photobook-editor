@@ -10,7 +10,7 @@ export type PhotoMeta = {
 };
 
 const photos = createEntityAdapter<PhotoMeta>({
-  sortComparer: (a,  b) => a.name.localeCompare(b.name),
+  sortComparer: (a, b) => a.name.localeCompare(b.name),
 });
 
 const slice = createSlice({
@@ -29,4 +29,14 @@ export default slice.reducer;
 
 const selectSelf = (state: RootState) => state.photos;
 
-export const photosSelectors = photos.getSelectors(selectSelf);
+const {
+  selectIds: selectPhotoIds,
+  selectById: selectPhotoById,
+  selectAll: selectAllPhotos,
+} = photos.getSelectors(selectSelf);
+
+export const photosSelectors = {
+  selectPhotoIds,
+  selectPhotoById,
+  selectAllPhotos,
+};

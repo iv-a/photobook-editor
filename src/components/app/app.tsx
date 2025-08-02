@@ -4,7 +4,8 @@ import { bootstrapPhotos } from "@/features/photos";
 import { useAppDispatch } from "@/hooks";
 import { useEffect } from "react";
 import { FileDrop } from "../file-drop";
-import { Gallery } from "../gallery";
+import { PairingPanel } from "../pairing-panel";
+import { PairsList } from "../pairs-list/pairs-list";
 
 export const App = () => {
   const dispatch = useAppDispatch();
@@ -21,7 +22,11 @@ export const App = () => {
       <div className="max-w-5xl mx-auto p-4 flex flex-col gap-4">
       <h1 className="text-xl font-semibold">Photobook — локальный импорт изображений</h1>
       <FileDrop />
-      <Gallery />
+      <PairingPanel />
+      <PairsList />
+      <p className="text-xs text-slate-500">
+        Хоткеи: → — следующая, Enter — оставить, X — не предлагать.
+      </p>
     </div>
     </ThemeProvider>
   );

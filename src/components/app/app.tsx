@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { FileDrop } from "../file-drop";
 import { PairingPanel } from "../pairing-panel";
 import { PairsList } from "../pairs-list/pairs-list";
+import { StorageInfo } from "../storage-info";
 
 export const App = () => {
   const dispatch = useAppDispatch();
@@ -24,6 +25,7 @@ export const App = () => {
       <FileDrop />
       <PairingPanel />
       <PairsList />
+      <StorageInfo />
       <p className="text-xs text-slate-500">
         Хоткеи: → — следующая, Enter — оставить, X — не предлагать.
       </p>

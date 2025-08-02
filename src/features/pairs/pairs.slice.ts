@@ -24,6 +24,15 @@ const slice = createSlice({
     },
     removePair: pairs.removeOne,
     clear: (s) => pairs.removeAll(s),
+    removeManyPairsByPhotoIds: (state, action) => {
+      const toDelete: string[] = [];
+      const set = new Set(action.payload as string[]);
+      for (const id of state.ids as string[]) {
+        const p = state.entities[id]!;
+        if (set.has(p.leftId) || set.has(p.rightId)) toDelete.push(id);
+      }
+      pairs.removeMany(state, toDelete);
+    },
   }
 });
 

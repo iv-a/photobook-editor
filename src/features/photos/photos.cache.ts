@@ -38,7 +38,7 @@ export const getUrl = async (id: string, preferThumb = true) => {
   mem.set(id, { url, lastUsed: performance.now() });
   evicitIfNeeded();
   return url;
-}
+};
 
 export const revokeUrl = (id: string) => {
   const e = mem.get(id);
@@ -46,4 +46,23 @@ export const revokeUrl = (id: string) => {
     URL.revokeObjectURL(e.url);
     mem.delete(id);
   }
+};
+
+export const revokeMany = (ids: string[]) => {
+  for (const id of ids) {
+    revokeUrl(id);
+  }
+};
+
+export const revokeAll = () => {
+  for (const id of Array.from(mem.keys())) {
+    revokeUrl(id);
+  }
+};
+
+export const seedTemp = (id: string, file: Blob) => {
+  const url = URL.createObjectURL(file);
+  mem.set(id, { url, lastUsed: performance.now() });
+  evicitIfNeeded();
+  return url;
 }

@@ -29,7 +29,8 @@ const pairing = createSlice({
     rejectPair(state, a: PayloadAction<{ baseId: string; candId: string }>) {
       state.rejected[`${a.payload.baseId}|${a.payload.candId}`] = true;
       state.step += 1;
-    }
+    },
+    reset: () => initialState,
   }
 });
 

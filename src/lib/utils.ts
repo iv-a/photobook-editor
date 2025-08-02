@@ -11,3 +11,9 @@ export const mulberry32 = (n: number) => () => {
   t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
+
+export const formatBytes = (n: number) => {
+  const u = ['B','KB','MB','GB','TB'];
+  let i = 0; while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+  return `${n.toFixed(1)} ${u[i]}`;
+}

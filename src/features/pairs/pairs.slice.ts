@@ -33,6 +33,10 @@ const slice = createSlice({
       }
       pairs.removeMany(state, toDelete);
     },
+    replaceAll: (state, action) => {
+      pairs.removeAll(state);
+      pairs.addMany(state, action.payload);
+    },
   }
 });
 

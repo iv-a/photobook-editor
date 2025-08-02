@@ -4,3 +4,4 @@ export { PhotoThumb } from "./photo-thumb";
 export { Gallery } from "./gallery";
 export { PairingPanel } from './pairing-panel';
 export { StorageInfo } from './storage-info';
+export { VirtualGallery } from './virtual-gallery';

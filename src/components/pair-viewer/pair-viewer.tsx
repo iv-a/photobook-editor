@@ -23,7 +23,7 @@ export const PairViewer = () => {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (!baseId || isMatchMode) return;
+      if (!baseId || !isMatchMode) return;
 
       switch (e.key) {
         case "ArrowLeft":

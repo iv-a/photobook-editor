@@ -56,7 +56,7 @@ export const PairViewer = () => {
         }
       }}
     >
-      <DialogContent className="p-5 min-w-[96vw] w-[96vw] max-h-[92vh]">
+      <DialogContent className="p-5 min-w-[100vw] w-[100vw] max-h-[100vh] h-[100vh]">
         {isMatchMode && (
           <div className="fixed left-1/2 -translate-x-1/2 bottom-4 z-10 flex items-center gap-2 bg-background/80 backdrop-blur-md border rounded-lg px-2 py-2 opacity-0 hover:opacity-100">
             <div className="flex flex-col items-center gap-3">

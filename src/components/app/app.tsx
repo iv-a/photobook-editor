@@ -7,7 +7,6 @@ import { PairingPanel } from "../pairing-panel";
 import { PairsList } from "../pairs-list/pairs-list";
 import { StorageInfo } from "../storage-info";
 import { preloadPairs } from "@/store";
-import { VirtualGallery } from "../virtual-gallery";
 
 export const App = () => {
   const dispatch = useAppDispatch();
@@ -21,10 +20,9 @@ export const App = () => {
   }, [dispatch]);
 
   return (
-    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <div className="max-w-5xl mx-auto p-4 flex flex-col gap-4">
       <h1 className="text-xl font-semibold">Photobook — локальный импорт изображений</h1>
-      <VirtualGallery />
       <FileDrop />
       <PairingPanel />
       <PairsList />

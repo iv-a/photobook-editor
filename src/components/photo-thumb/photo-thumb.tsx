@@ -1,6 +1,7 @@
 import { getUrl, photosSelectors } from "@/features/photos";
 import { useAppSelector } from "@/hooks";
 import { useEffect, useState } from "react";
+import { Card } from "../ui/card";
 
 type PhotoThumbProps = {
   id: string;
@@ -33,12 +34,12 @@ export const PhotoThumb = ({ id, size = 120 }: PhotoThumbProps) => {
   }
 
   return (
-    <div style={{ width: size, height: size }} className="overflow-hidden rounded border">
+    <Card style={{ width: size, height: size }} className="overflow-hidden grid place-items-center bg-muted">
       {url ? (
-        <img src={url} alt={meta.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img src={url} alt={meta.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
       ) : (
-        <div className="w-full h-full grid place-items-center text-xs text-slate-500">Загрузка…</div>
+        <div className="text-xs text-muted-foreground">Загрузка…</div>
       )}
-    </div>
+    </Card>
   );
 };

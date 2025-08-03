@@ -7,7 +7,7 @@ import { Button } from "../ui/button";
 import { pairingActions, pairingSelectors } from "@/features/pairing";
 import { pairsActions } from "@/features/pairs";
 import { PairingProgress } from "../pairing-progress";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const PairViewer = () => {
   const dispatch = useAppDispatch();
@@ -20,6 +20,51 @@ export const PairViewer = () => {
   const { src: baseSrc, meta: baseMeta } = useGetImage(baseId);
 
   const { src: candSrc, meta: candMeta } = useGetImage(candId);
+  const [isReversed, setIsReversed] = useState<boolean>(false);
+
+  let leftContent = baseSrc ? (
+    <div className="grid grid-rows-[1fr_max-content] min-h-0">
+      <div className="flex items-center justify-center overflow-hidden min-h-0">
+        <img
+          src={baseSrc}
+          alt=""
+          className={cn("max-w-full max-h-full object-contain")}
+        />
+      </div>
+
+      <p className="text-xs text-muted-foreground px-2 py-1 text-center whitespace-normal break-words">
+        {baseMeta?.name}
+      </p>
+    </div>
+  ) : (
+    <div className="w-full h-full grid place-items-center text-sm text-muted-foreground">
+      Загрузка…
+    </div>
+  );
+
+  let rightContent = candSrc ? (
+    <div className="grid grid-rows-[1fr_max-content] min-h-0">
+      <div className="flex items-center justify-center overflow-hidden min-h-0">
+        <img
+          src={candSrc}
+          alt=""
+          className={cn("max-w-full max-h-full object-contain")}
+        />
+      </div>
+
+      <p className="text-xs text-muted-foreground px-2 py-1 text-center whitespace-normal break-words">
+        {candMeta?.name}
+      </p>
+    </div>
+  ) : (
+    <div className="w-full h-full grid place-items-center text-sm text-muted-foreground">
+      Загрузка…
+    </div>
+  );
+
+  if (isReversed) {
+    [leftContent, rightContent] = [rightContent, leftContent];
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -56,11 +101,19 @@ export const PairViewer = () => {
         }
       }}
     >
-      <DialogContent className="p-5 min-w-[100vw] w-[100vw] max-h-[100vh] h-[100vh]">
+      <DialogContent className="p-5 min-w-[95vw] w-[95vw] max-h-[95vh] h-[95vh] min-h-0">
         {isMatchMode && (
           <div className="fixed left-1/2 -translate-x-1/2 bottom-4 z-10 flex items-center gap-2 bg-background/80 backdrop-blur-md border rounded-lg px-2 py-2 opacity-0 hover:opacity-100">
             <div className="flex flex-col items-center gap-3">
               <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  disabled={!baseId}
+                  onClick={() => setIsReversed((prev) => !prev)}
+                  title="Поменять местами"
+                >
+                  Поменять местами
+                </Button>
                 <Button
                   variant="secondary"
                   disabled={!baseId || left === 0}
@@ -100,40 +153,10 @@ export const PairViewer = () => {
           </div>
         )}
         <DialogTitle hidden />
-        <div className="max-w-[100%] max-h-[100%] grid grid-cols-2 overflow-hidden">
-          {baseSrc ? (
-            <div className="flex flex-col justify-self-end  gap-1">
-              <img
-                src={baseSrc}
-                alt=""
-                className={cn("select-none object-contain grow-1")}
-              />
-              <p className="text-xs text-muted-foreground mb-1">
-                {baseMeta?.name}
-              </p>
-            </div>
-          ) : (
-            <div className="w-full h-full grid place-items-center text-sm text-muted-foreground">
-              Загрузка…
-            </div>
-          )}
-          {candSrc ? (
-            <div className="flex flex-col justify-self-start gap-1">
-              <img
-                src={candSrc}
-                alt=""
-                className={cn("select-none object-contain grow-1")}
-              />
-              <p className="text-xs text-muted-foreground mb-1">
-                {candMeta?.name}
-              </p>
-            </div>
-          ) : (
-            <div className="w-full h-full grid place-items-center text-sm text-muted-foreground">
-              Загрузка…
-            </div>
-          )}
-        </div>
+        <div className={cn("grid grid-cols-2 w-full h-full min-h-0")}>
+          {leftContent}
+          {rightContent}
+          </div>
       </DialogContent>
     </Dialog>
   );

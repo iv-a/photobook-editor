@@ -1,5 +1,9 @@
 import type { RootState } from "@/store";
-import { createSelector, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSelector,
+  createSlice,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import { photosSelectors } from "../photos";
 import { mulberry32 } from "@/lib/utils";
 
@@ -8,12 +12,20 @@ type PairingState = {
   seed: number;
   step: number;
   rejected: Record<string, true>;
+  seen: Record<string, true>;
 };
 
-const initialState: PairingState = { seed: 123456789, step: 0, rejected: {} };
+const initialState: PairingState = {
+  seed: 123456789,
+  step: 0,
+  rejected: {},
+  seen: {},
+};
+
+const key = (b: string, c: string) => `${b}|${c}`;
 
 const pairing = createSlice({
-  name: 'pairing',
+  name: "pairing",
   initialState,
   reducers: {
     setBase(state, a: PayloadAction<string | undefined>) {
@@ -25,13 +37,25 @@ const pairing = createSlice({
     },
     setSeed(state, a: PayloadAction<number>) {
       state.seed = a.payload;
+      state.step = 0;
+    },
+    markSeen(state, a: PayloadAction<{ baseId: string; candId: string }>) {
+      state.seen[key(a.payload.baseId, a.payload.candId)] = true;
     },
     rejectPair(state, a: PayloadAction<{ baseId: string; candId: string }>) {
-      state.rejected[`${a.payload.baseId}|${a.payload.candId}`] = true;
+      state.rejected[key(a.payload.baseId, a.payload.candId)] = true;
+      state.seen[key(a.payload.baseId, a.payload.candId)] = true;
       state.step += 1;
     },
     reset: () => initialState,
-  }
+    clearSeenForBase(state, a: PayloadAction<string>) {
+      const base = a.payload;
+      for (const k of Object.keys(state.seen)) {
+        if (k.startsWith(base + '|')) delete state.seen[k];
+      }
+      state.step = 0;
+    },
+  },
 });
 
 export const pairingActions = pairing.actions;
@@ -41,7 +65,7 @@ const selectBaseId = (s: RootState) => selectSelf(s).baseId;
 
 const selectCandidateIds = createSelector(
   [photosSelectors.selectPhotoIds, selectSelf],
-  (ids, { baseId, rejected} )=> {
+  (ids, { baseId, rejected }) => {
     if (!baseId) {
       return [];
     }
@@ -54,17 +78,51 @@ const selectCandidateIds = createSelector(
     return out;
   }
 );
-const selectCurrentCandidateId = createSelector(
-  [selectCandidateIds, selectSelf],
-  (cands, {seed, step} ) => {
-    if  (!cands.length) return undefined;
-    const rnd = mulberry32(seed + step)();
-    return cands[Math.floor(rnd * cands.length)];
+
+export const selectPoolIds = createSelector(
+  [photosSelectors.selectPhotoIds, selectSelf],
+  (ids, { baseId, rejected }) => {
+    if (!baseId) return [] as string[];
+    const out: string[] = [];
+    for (const id of ids as string[]) {
+      if (id === baseId) continue;
+      if (!rejected[`${baseId}|${id}`]) out.push(id);
+    }
+    return out;
   }
-)
+);
+
+export const selectAvailableIds = createSelector(
+  [selectPoolIds, selectSelf],
+  (pool, { baseId, seen }) => {
+    if (!baseId) return [] as string[];
+    return pool.filter(id => !seen[`${baseId}|${id}`]);
+  }
+);
+
+const selectCurrentCandidateId = createSelector(
+  [selectAvailableIds, selectSelf],
+  (available, { seed, step }) => {
+    if (!available.length) return undefined;
+    const rnd = mulberry32(seed + step)();
+    return available[Math.floor(rnd * available.length)];
+  }
+);
+export const selectProgress = createSelector(
+  [selectPoolIds, selectAvailableIds],
+  (pool, available) => {
+    const total = pool.length;
+    const left = available.length;
+    const seen = Math.max(0, total - left);
+    return { total, seen, left };
+  }
+);
 
 export const pairingSelectors = {
   selectBaseId,
   selectCandidateIds,
   selectCurrentCandidateId,
-}
+  selectProgress,
+  selectPoolIds,
+  selectAvailableIds
+};

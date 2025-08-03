@@ -1,96 +1,91 @@
 import { pairingActions, pairingSelectors } from "@/features/pairing";
-import { pairsActions } from "@/features/pairs";
 import { photosSelectors } from "@/features/photos";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Card } from "../ui/card";
+import { SelectableThumb } from "../selectable-thumb";
+import { ScrollArea } from "../ui/scroll-area";
+import { Separator } from "../ui/separator";
+import { Button } from "../ui/button";
+import { ImageViewer } from "../image-viewer";
 import { PhotoThumb } from "../photo-thumb";
+import { pairActions } from "@/features/pair";
 
 export const PairingPanel = () => {
   const dispatch = useAppDispatch();
   const ids = useAppSelector(photosSelectors.selectPhotoIds);
   const baseId = useAppSelector(pairingSelectors.selectBaseId);
   const candId = useAppSelector(pairingSelectors.selectCurrentCandidateId);
+  const [viewer, setViewer] = useState<{ id?: string; open: boolean }>({
+    open: false,
+  });
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (!baseId) return;
-
-      switch (e.key) {
-        case "ArrowLeft":
-        case "ArrowRight":
-          dispatch(pairingActions.nextCandidate());
-          break;
-        case "Enter": {
-          if (candId) {
-            dispatch(pairsActions.keepPair(baseId, candId));
-          }
-          break;
-        }
-        case "x":
-        case "X": {
-          if (candId) {
-            dispatch(pairingActions.rejectPair({baseId, candId}));
-          }
-          break;
-        }
-      }
-    };
-
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [dispatch, baseId, candId]);
+    if (!baseId || !candId) {
+      return;
+    }
+    dispatch(pairActions.setPair({ baseId, candId }));
+  }, [baseId, candId, dispatch]);
 
   return (
-    <div className="grid gap-4 md:grid-cols-[280px_1fr]">
-      <aside className="border rounded p-2 h-[70vh] overflow-auto">
+    <div className="grid gap-4 md:grid-cols-[300px_1fr]">
+      <Card className="p-3 h-[70vh]">
         <div className="text-sm font-medium mb-2">Выбор базового фото</div>
-        <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))' }}>
-          {ids.map(id => (
-            <button
-              key={id}
-              className={`rounded border ${baseId === id ? 'ring-2 ring-blue-500' : ''}`}
-              onClick={() => dispatch(pairingActions.setBase(id))}
-              title={id}
-            >
-              <PhotoThumb id={id} size={80} />
-            </button>
-          ))}
-        </div>
-      </aside>
-
-      <main className="border rounded p-3 flex flex-col gap-3">
-        <div className="flex items-center gap-3 justify-center">
-          <div className="text-center">
-            <div className="text-xs text-slate-500 mb-1">База</div>
-            {baseId ? <PhotoThumb id={baseId} size={240} /> : <div className="text-sm text-slate-500">Выбери фото слева</div>}
-          </div>
-          <div className="text-2xl">+</div>
-          <div className="text-center">
-            <div className="text-xs text-slate-500 mb-1">Кандидат</div>
-            {candId ? <PhotoThumb id={candId} size={240} /> : <div className="text-sm text-slate-500">Нет кандидатов</div>}
-          </div>
-        </div>
-
-        <div className="flex gap-2 justify-center">
-          <button className="border rounded px-3 py-1" onClick={() => dispatch(pairingActions.nextCandidate())} disabled={!baseId}>
-            Другая пара (→)
-          </button>
-          <button
-            className="border rounded px-3 py-1"
-            onClick={() => baseId && candId && dispatch(pairsActions.keepPair(baseId, candId))}
-            disabled={!baseId || !candId}
+        <ScrollArea className="pr-2 h-[90%]">
+          <div
+            className="grid gap-2"
+            style={{
+              gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))",
+            }}
           >
-            Оставить (Enter)
-          </button>
-          <button
-            className="border rounded px-3 py-1"
-            onClick={() => baseId && candId && dispatch(pairingActions.rejectPair({ baseId, candId }))}
-            disabled={!baseId || !candId}
-          >
-            Не предлагать (X)
-          </button>
+            {ids.map((id) => (
+              <SelectableThumb
+                key={id}
+                id={id}
+                selected={baseId === id}
+                onSelect={() => dispatch(pairingActions.setBase(id))}
+                onOpen={() => {
+                  if (baseId === id) setViewer({ id, open: true });
+                }}
+              />
+            ))}
+          </div>
+        </ScrollArea>
+      </Card>
+
+      <Card className="p-4 flex flex-col gap-3">
+        <div className="flex items-center justify-center gap-4">
+          <div className="text-center">
+            <div className="text-xs text-muted-foreground mb-1">База</div>
+            {baseId ? (
+              <PhotoThumb id={baseId} size={500} />
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                Выбери фото слева
+              </div>
+            )}
+          </div>
         </div>
-      </main>
+
+        <Separator />
+        <Button
+          disabled={!baseId}
+          onClick={() => {
+            if (baseId && candId) {
+              dispatch(pairActions.openPair({ baseId, candId }));
+              dispatch(pairActions.setMode('match'));
+            }
+          }}
+        >
+          Начать подбор
+        </Button>
+      </Card>
+
+      <ImageViewer
+        id={viewer.id}
+        open={viewer.open}
+        onOpenChange={(v) => setViewer((p) => ({ ...p, open: v }))}
+      />
     </div>
   );
 };

@@ -1,6 +1,9 @@
 import { importFiles } from "@/features/photos";
 import { useAppDispatch } from "@/hooks";
 import { useCallback, useRef, useState } from "react";
+import { Card } from "../ui/card";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 export const FileDrop = () => {
   const dispatch = useAppDispatch();
@@ -19,7 +22,7 @@ export const FileDrop = () => {
   );
 
   return (
-    <div
+    <Card
       onDragOver={(e) => {
         e.preventDefault();
         setIsOver(true);
@@ -30,25 +33,24 @@ export const FileDrop = () => {
         setIsOver(false);
         onFiles(e.dataTransfer.files);
       }}
-      className={`border p-3 rounded ${isOver ? "bg-slate-100" : "bg-white"}`}
+      className={`p-3 ${isOver ? 'bg-muted' : ''}`}
     >
       <div className="flex items-center gap-2">
-        <button
-          className="border rounded px-3 py-1"
+        <Button
           onClick={() => inputRef.current?.click()}
         >
           Выбрать файлы
-        </button>
-        <span className="text-sm text-slate-600">или перетащи сюда</span>
+        </Button>
+        <span className="text-sm text-muted-foreground">или перетащи сюда</span>
       </div>
-      <input
+      <Input
         ref={inputRef}
         type="file"
         accept="image/*"
         multiple
-        hidden
+        className="hidden"
         onChange={(e) => onFiles(e.currentTarget.files)}
       />
-    </div>
+    </Card>
   );
 };

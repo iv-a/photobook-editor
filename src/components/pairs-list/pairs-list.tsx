@@ -2,6 +2,8 @@
 import { pairsActions, pairsSelectors } from "@/features/pairs";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { PhotoThumb } from "../photo-thumb";
+import { Card } from "../ui/card";
+import { pairActions } from "@/features/pair";
 
 export const PairsList = () => {
   const dispatch = useAppDispatch();
@@ -17,7 +19,7 @@ export const PairsList = () => {
       </div>
       <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
         {pairs.map(p => (
-          <div key={p.id} className="border rounded p-2 flex items-center gap-2">
+          <Card key={p.id} className="border rounded p-2 flex items-center gap-2" onClick={() => dispatch(pairActions.openPair({baseId: p.leftId, candId: p.rightId}))}>
             <PhotoThumb id={p.leftId} size={110} />
             <div className="text-2xl">+</div>
             <PhotoThumb id={p.rightId} size={110} />
@@ -28,7 +30,7 @@ export const PairsList = () => {
             >
               ✕
             </button>
-          </div>
+          </Card>
         ))}
       </div>
     </section>

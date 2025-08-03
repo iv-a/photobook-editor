@@ -2,6 +2,7 @@ import { configureStore, createListenerMiddleware, isAnyOf } from "@reduxjs/tool
 import { db, photosReducer } from "@/features/photos";
 import { pairingReducer } from "@/features/pairing";
 import { pairsActions, pairsReducer } from "@/features/pairs";
+import { pairReducer } from "@/features/pair";
 
 const lm = createListenerMiddleware();
 
@@ -30,6 +31,7 @@ export const store = configureStore({
     photos: photosReducer,
     pairing: pairingReducer,
     pairs: pairsReducer,
+    pair: pairReducer,
   },
   middleware: (gDM) => gDM().prepend(lm.middleware),
 });

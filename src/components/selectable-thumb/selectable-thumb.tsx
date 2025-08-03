@@ -1,6 +1,5 @@
 import { useAppDispatch } from "@/hooks";
 import { cn } from "@/lib/utils";
-import { useRef } from "react";
 import { Button } from "../ui/button";
 import { deletePhotos } from "@/features/photos";
 import { X } from "lucide-react";
@@ -15,7 +14,6 @@ type SelectableThumbProps = {
 
 export const SelectableThumb = ({ id, selected, onSelect,  onOpen }: SelectableThumbProps) => {
   const dispatch = useAppDispatch();
-  const clickTimer = useRef<number | null>(null);
 
   return (
     <div className={cn("relative rounded", selected && "ring-2 ring-primary")}>
@@ -29,11 +27,9 @@ export const SelectableThumb = ({ id, selected, onSelect,  onOpen }: SelectableT
       </Button>
 
       <div
-        onClick={() => {
-          clickTimer.current = window.setTimeout(() => onSelect(), 180);
-        }}
+        onClick={onSelect}
         onDoubleClick={() => {
-          if (clickTimer.current) { clearTimeout(clickTimer.current); clickTimer.current = null; }
+          // if (clickTimer.current) { clearTimeout(clickTimer.current); clickTimer.current = null; }
           onOpen();
         }}
       >

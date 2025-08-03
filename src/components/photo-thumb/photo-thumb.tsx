@@ -1,14 +1,14 @@
-import { getUrl, photosSelectors } from "@/features/photos";
+import { photosSelectors } from "@/features/photos";
 import { useAppSelector } from "@/hooks";
 import { useEffect, useState } from "react";
-import { Card } from "../ui/card";
+import { getThumbUrl } from "@/features/photos/photos.cache";
 
 type PhotoThumbProps = {
   id: string;
   size?: number;
 };
 
-export const PhotoThumb = ({ id, size = 120 }: PhotoThumbProps) => {
+export const PhotoThumb = ({ id, size = 240 }: PhotoThumbProps) => {
   const meta = useAppSelector((s) => photosSelectors.selectPhotoById(s, id));
   const [url, setUrl] = useState<string>();
 
@@ -16,7 +16,7 @@ export const PhotoThumb = ({ id, size = 120 }: PhotoThumbProps) => {
     let alive = true;
     
     const cb = async () => {
-      const u = await getUrl(id, true);
+      const u = await getThumbUrl(id);
       if (alive) {
         setUrl(u);
       }
@@ -34,12 +34,13 @@ export const PhotoThumb = ({ id, size = 120 }: PhotoThumbProps) => {
   }
 
   return (
-    <Card style={{ width: size, height: size }} className="overflow-hidden grid place-items-center bg-muted">
+    <div style={{ width: size }} className="overflow-hidden grid place-items-center max-h-[200px]">
       {url ? (
-        <img src={url} alt={meta.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        <img src={url} alt={meta.name} className="object-contain" />
       ) : (
         <div className="text-xs text-muted-foreground">Загрузка…</div>
       )}
-    </Card>
+      <p className="text-xs text-muted-foreground mb-1">{meta.name}</p>
+    </div>
   );
 };
